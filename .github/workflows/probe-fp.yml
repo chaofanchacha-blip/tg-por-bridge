@@ -1,0 +1,11 @@
+name: Probe Fingerprint
+on: workflow_dispatch
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    env:
+      TGSTACK_DSN: ${{ secrets.TGSTACK_DSN }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install -q telethon psycopg2-binary
+      - run: python probe/fp_probe.py
