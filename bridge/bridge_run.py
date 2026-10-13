@@ -37,9 +37,23 @@ def bark_push(title, body, url=None):
         log('BARK_ERR', repr(e)[:120])
 
 
+CMD_TOKEN = os.environ.get('CMD_TOKEN', '')
+
+
 def read_remote(name):
+    if CMD_TOKEN:
+        try:
+            req = urllib.request.Request(
+                'https://api.github.com/repos/chaofanchacha-blip/tg-por-bridge/contents/cmd/' + name,
+                headers={'Authorization': 'Bearer ' + CMD_TOKEN,
+                         'Accept': 'application/vnd.github.raw'})
+            with urllib.request.urlopen(req, timeout=15) as r:
+                return r.read().decode('utf-8', 'replace').strip()
+        except Exception:
+            return ''
     try:
-        with urllib.request.urlopen(RAW_CMD + '/' + name, timeout=15) as r:
+        u = RAW_CMD + '/' + name + '?t=' + str(int(time.time()))
+        with urllib.request.urlopen(u, timeout=15) as r:
             return r.read().decode('utf-8', 'replace').strip()
     except Exception:
         return ''
