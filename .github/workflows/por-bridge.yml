@@ -16,6 +16,7 @@ jobs:
       BARK_KEY: ${{ secrets.BARK_KEY }}
       TG_PHONE: ${{ secrets.TG_PHONE }}
       LISTEN_MINUTES: '320'
+      CMD_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
 
@@ -44,7 +45,7 @@ jobs:
 
       - name: Listen
         id: listen
-        if: ${{ github.event_name != 'schedule' || steps.gate.outputs.active == '0' }}
+        if: ${{ (github.event_name != 'schedule' || steps.gate.outputs.active == '0') && secrets.BARK_KEY != '' && secrets.TG_PHONE != '' }}
         timeout-minutes: 330
         run: |
           pip install -q 'telethon>=1.34,<2'
@@ -58,7 +59,7 @@ jobs:
           key: por-tg-session-${{ github.run_id }}
 
       - name: Chain next listener
-        if: ${{ always() && steps.listen.outcome != 'skipped' }}
+        if: ${{ always() && steps.listen.outcome != 'skipped' && secrets.BARK_KEY != '' && secrets.TG_PHONE != '' }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
